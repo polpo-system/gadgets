@@ -21,16 +21,18 @@ portia.Install gadgets
         ListGadgets
     src/TextDocs, PanelDocs                                         text and panel documents
     src/Columbus, GadgetsIn, GadgetsOut                             the inspector, gadget I/O
+    src/DocWindows                                                  documents in X11 windows
     share/  TextDocs.Lib, Icons.Lib, Columbus.Lib, Symbols.Lib, the panels Gadgets, Documents,
             Libraries and TextDocs, the pictures Default, Backdrop and Gadgets
-    tools/TextDocs.Tool
-    test/GadgetsTest.Mod
+    tools/TextDocs.Tool, DocWindows.Tool
+    test/GadgetsTest.Mod, DocWindowsTest.Mod
 
 The sources come from ETH Linux Oberon (OLR, 2017-06-18), converted to plain text; the first
 commit has them unchanged, changes for polpo follow, one commit each. They compile unchanged with
 all five of polpo's compilers (x86, ARM, ARMv7, RISC-V, MIPS). TextPopups (popup menus for texts)
 is not here: it reads source texts with the scanner of the x86 compiler and becomes a package of
-its own. `SetGadgets` needs `BIT`, from the package bit.
+its own. `SetGadgets` needs `BIT`, from the package bit. DocWindows is polpo's, on its module
+Windows.
 
 ## Using
 
@@ -40,6 +42,12 @@ its own. `SetGadgets` needs `BIT`, from the package bit.
                                         Gadgets in Oberon.Text)
     TextDocs.NewDoc, PanelDocs.NewDoc   new documents
     Columbus.Inspect                    the attributes of the selected gadget
+    DocWindows.OpenDoc HPCalc.Panel     a document in an X11 window of its own, beside the desktop
+
+Run from a shell, without the desktop, a document in a window is a program of its own: only its
+window shows, and loksh ends when it is closed:
+
+    loksh DocWindows.OpenDoc HPCalc.Panel
 
 The panels were laid out for a font scale of 100%. polpo scales the screen fonts (150% by
 default, `System.SetFontScale`), and a panel keeps its gadgets where they were, so their captions
@@ -49,6 +57,8 @@ can overlap; `System.SetFontScale 100` shows them as designed.
 
     GadgetsTest.Run      23 checks: the standard gadgets made, given attributes and put into a
                          panel, a text document opened; it needs the desktop's display
+    DocWindowsTest.Run   5 checks: a text document in a window of its own, below the screen and
+                         filled by the document, then closed; it needs X11
 
 The license is GPL-3 (`LICENSE`); the code comes from ETH Oberon, whose license (`LICENSE.ETH`)
 asks to keep its copyright notice and conditions, which `LICENSE.ETH` does.
