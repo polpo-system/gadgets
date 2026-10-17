@@ -3,6 +3,8 @@ MODULE DocWindows;  (** polpo: gadget documents in X11 windows of their own *)
 (** DocWindows.OpenDoc name ~ opens the document name (a panel, a picture, a text, ...) in a window
   of its own, as large as the document and with its file name as the title. The window looks like the
   windows of the other programs: the window manager moves it, and its close button closes it.
+  Run from a shell (loksh DocWindows.OpenDoc HPCalc.Panel), without the desktop, the document is a
+  program of its own: only its window shows, and loksh ends when it is closed (Windows.Run).
   Programs call Open(D). The windows are those of the module Windows of polpo (X11 only). *)
 
 IMPORT Display, Texts, Oberon, Documents, Windows;
@@ -26,7 +28,7 @@ END Open;
 
 (** DocWindows.OpenDoc name ~  the document name in a window of its own; ^ takes the selected name *)
 PROCEDURE OpenDoc*;
-VAR S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT; D: Documents.Document;
+VAR S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT; D: Documents.Document; V: Windows.Window;
 BEGIN
   Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
   IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -36,7 +38,11 @@ BEGIN
   IF S.class IN {Texts.Name, Texts.String} THEN
     D := Documents.Open(S.s);
     IF (D = NIL) OR (D.dsc = NIL) THEN Texts.WriteString(W, Documents.errMsg)
-    ELSIF Open(D) = NIL THEN Texts.WriteString(W, "DocWindows.OpenDoc: no window (X11 only, at most 16, as large as the screen)")
+    ELSE
+      V := Open(D);
+      IF V = NIL THEN Texts.WriteString(W, "DocWindows.OpenDoc: no window (X11 only, at most 16, as large as the screen)")
+      ELSE Windows.Run(V)  (* without the desktop: a program of its own *)
+      END
     END
   ELSE Texts.WriteString(W, "usage: DocWindows.OpenDoc name ~  a document in a window of its own")
   END;

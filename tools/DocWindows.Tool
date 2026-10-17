@@ -4,3 +4,6 @@ moves them, their close button closes them (X11 only, at most 16 windows)
   DocWindows.OpenDoc HPCalc.Panel     a panel in a window as large as it
   DocWindows.OpenDoc ^                the selected document
   Windows.OpenText System.Tool 500 300   a text in a window (polpo's module Windows)
+
+From a shell, without the desktop, a document is a program of its own; loksh ends with its window:
+  loksh DocWindows.OpenDoc HPCalc.Panel
