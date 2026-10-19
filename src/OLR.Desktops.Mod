@@ -1224,20 +1224,26 @@ VAR list: Display.Frame; X, Y: INTEGER;C: Display.ConsumeMsg;
 	PROCEDURE Finder();
 	VAR obj: Objects.Object; f: Display.Frame;
 	BEGIN
-		obj := Gadgets.CreateObject("Finder.NewFrame"); f := obj(Gadgets.Frame);
-		DEC(Y, f.H + 4);
-		f.X := X; f.Y := Y;
-		f.slink := list; list := f;
+		obj := Gadgets.CreateObject("Finder.NewFrame");
+		IF obj # NIL THEN  (* polpo: Finder is the package gadgets-finder, maybe not installed *)
+			f := obj(Gadgets.Frame);
+			DEC(Y, f.H + 4);
+			f.X := X; f.Y := Y;
+			f.slink := list; list := f
+		END
 	END Finder;
 
 	PROCEDURE Navigator();
 	VAR obj: Objects.Object; f: Display.Frame;
 	BEGIN
-		obj := Gadgets.CreateObject("Navigators.NewNavigator"); f := obj(Gadgets.Frame);
-		f.H := 31; f.W := 36;
-		DEC(Y, f.H + 4);
-		f.X := X; f.Y := Y;
-		f.slink := list; list := f
+		obj := Gadgets.CreateObject("Navigators.NewNavigator");
+		IF obj # NIL THEN
+			f := obj(Gadgets.Frame);
+			f.H := 31; f.W := 36;
+			DEC(Y, f.H + 4);
+			f.X := X; f.Y := Y;
+			f.slink := list; list := f
+		END
 	END Navigator;
 
 BEGIN
