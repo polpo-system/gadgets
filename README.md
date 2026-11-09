@@ -56,6 +56,9 @@ can overlap; `System.SetFontScale 100` shows them as designed.
 With `LeftHanded = Yes` in the System section of Oberon.Text the arrow over gadgets points up
 and to the right, for the left hand, as the arrow of the desktop does.
 
+While a command started from a button or another gadget runs, the arrow stays where the mouse
+is, as it does for a command started from a text.
+
 ## Tests
 
     GadgetsTest.Run      23 checks: the standard gadgets made, given attributes and put into a
