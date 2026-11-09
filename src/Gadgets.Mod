@@ -689,7 +689,7 @@ END MakePrinterMask0;
 (** Execute a string as an Oberon command. The parameters executor, dlink, sender, receiver are copied to the global variables executorObj, context, senderObj, receiverObj respectively. Dlink must be the parent of executor. If a '%' is leading the command, no Oberon.Par is set up. *)
 PROCEDURE Execute*(cmd: ARRAY OF CHAR; executor, dlink, sender, receiver: Objects.Object);
 VAR T: Texts.Text; S: Attributes.Scanner; ch: CHAR; res, cx, cy, cw, chl, i, j: INTEGER;
-	oldcontext, obj: Objects.Object; str: BOOLEAN;
+	oldcontext, obj: Objects.Object; str: BOOLEAN; keys: SET; mx, my: INTEGER;
 BEGIN
 	IF cmd[0] = 0X THEN RETURN END;
 	ch := 0X; T := NIL;
@@ -763,6 +763,9 @@ BEGIN
 	
 	IF executor # NIL THEN oldcontext := executor.dlink; executor.dlink := context END;
 	
+	(* polpo: the arrow at the mouse while the command works, as after a middle click on a command in a text
+		(a gadget that was pressed took it away, and only the loop of the desktop draws it again) *)
+	IF ~Oberon.Mouse.on THEN Input.Mouse(keys, mx, my); Oberon.DrawCursor(Oberon.Mouse, Effects.Arrow, mx, my) END;
 	Oberon.Call(cmd, par, FALSE, res);
 	IF res # 0 THEN
 		Texts.WriteString(W, "Call error: "); Texts.WriteString(W, Modules.resMsg);
