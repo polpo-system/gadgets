@@ -20,7 +20,7 @@ MODULE Effects;	(** portable *) (** jm 18.1.95 *)
 	pjm 28.03.96 - flying cursor (thanks PM)
 *)
 
-IMPORT Display, Display3, Input, Oberon;
+IMPORT Display, Display3, Input, Oberon, Texts;
 
 CONST markW = 5; GravQ = 4; MinGrav = 2; 
 			left = 2; middle = 1; right = 0;
@@ -67,6 +67,8 @@ VAR
 	X0, Y0, bX, bY: INTEGER; (* global tracker variables; complete bullshit, must be deleted ! *)
 
 	arrowshape: Display.Pattern;
+	leftArrow, leftShape: Display.Pattern;	(* polpo: both mirrored, for System.LeftHanded = Yes in Oberon.Text *)
+	leftHanded: BOOLEAN;
 
 PROCEDURE Min(x, y: INTEGER): INTEGER;
 BEGIN IF x < y THEN RETURN x ELSE RETURN y END END Min;
@@ -675,6 +677,15 @@ VAR s: INTEGER; cx,cy,cw,ch : INTEGER;
 BEGIN
 	Display.GetClip(cx,cy,cw,ch);
 	Display.ResetClip;
+	IF leftHanded THEN	(* polpo: the arrow points up and to the right, its tip at the mouse as in Oberon *)
+		IF x > Display.Width - 2 THEN x := Display.Width - 2 END;
+		GetBlock(x-14, y-15, 16, 16, block, TRUE);
+		Display.SetClip(0, 0, Display.Width, Display.Height);
+		Display.CopyPattern(Display.FG, leftArrow, x-14, y-15, Display.paint);
+		Display.CopyPattern(Display.BG, leftShape, x-14, y-15, Display.paint);
+		Display.SetClip(cx, cy, cw, ch);
+		RETURN
+	END;
 	IF x < 1 THEN x := 1 END;
 (*
 	IF (x < Display.ColLeft) THEN
@@ -696,6 +707,34 @@ BEGIN
 	RestoreBlock(block, TRUE)
 END FadeArrow;
 (* --- *)
+
+(* polpo: System.LeftHanded = Yes in Oberon.Text: the arrow of Display (Oberon draws the same) and the outline
+	shape mirrored; DrawArrow puts them on the left of the mouse *)
+PROCEDURE InitLeftArrow(VAR shape: ARRAY OF SET);
+VAR S: Texts.Scanner; image: ARRAY 16 OF SET; i: INTEGER;
+
+	PROCEDURE Mirror(s: SET; w: INTEGER): SET;
+	VAR m: SET; b: INTEGER;
+	BEGIN m := {}; b := 0;
+		WHILE b < w DO IF b IN s THEN INCL(m, w - 1 - b) END; INC(b) END;
+		RETURN m
+	END Mirror;
+
+BEGIN
+	leftHanded := FALSE;
+	Oberon.OpenScanner(S, "System.LeftHanded");
+	IF (S.class = Texts.Name) & (S.s = "Yes") THEN
+		image[0] := {13}; image[1] := {12..14}; image[2] := {11..13}; image[3] := {10..12}; image[4] := {9..11};
+		image[5] := {8..10}; image[6] := {7..9}; image[7] := {0, 6..8}; image[8] := {0, 1, 5..7}; image[9] := {0..2, 4..6};
+		image[10] := {0..5}; image[11] := {0..4}; image[12] := {0..5}; image[13] := {0..6}; image[14] := {0..7};
+		image[15] := {};
+		i := 0; WHILE i < 15 DO image[i] := Mirror(image[i], 15); INC(i) END;
+		leftArrow := Display.NewPattern(15, 15, image);
+		i := 0; WHILE i < 16 DO image[i] := Mirror(shape[i], 16); INC(i) END;
+		leftShape := Display.NewPattern(16, 16, image);
+		leftHanded := TRUE
+	END
+END InitLeftArrow;
 
 PROCEDURE InitCursors;	
 VAR flatHandS, pointHandS, movePatS, copyPatS, image: ARRAY 16 OF SET; crossPatS: ARRAY 23 OF SET;
@@ -753,6 +792,7 @@ BEGIN
 	image[12] := {0, 7};	image[13] := {0, 8};
 	image[14] := {0, 9};	image[15]:= {0..9};
 	arrowshape := Display.NewPattern(16, 16, image);	(* thanks PM *)
+	InitLeftArrow(image);
 	
 	FlatHand.Draw := DrawFlatHand;
 	FlatHand.Fade := Fade;
