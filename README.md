@@ -53,6 +53,9 @@ The panels were laid out for a font scale of 100%. polpo scales the screen fonts
 default, `System.SetFontScale`), and a panel keeps its gadgets where they were, so their captions
 can overlap; `System.SetFontScale 100` shows them as designed.
 
+With `LeftHanded = Yes` in the System section of Oberon.Text the arrow over gadgets points up
+and to the right, for the left hand, as the arrow of the desktop does.
+
 ## Tests
 
     GadgetsTest.Run      23 checks: the standard gadgets made, given attributes and put into a
